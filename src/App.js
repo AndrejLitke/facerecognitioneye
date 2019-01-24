@@ -38,11 +38,28 @@ class App extends Component {
       box: {},
       route: Routes.SIGNINROUTE,
       isSignedIn: false,
+      user: {
+        id: '',
+        name: '',
+        email: '',
+        entries: 0,
+        joined: ''
+      }
     }
   }
 
-  componentDidMount() {
-    console.log('hallo welt');
+  loadUser = (data) => {
+    this.setState({
+      user: 
+        {
+        id: data.id,
+        name: data.name,
+        email: data.email,
+        entries: data.entries,
+        joined: data.joined
+        }
+    });
+    console.log(this.state.user);
   }
 
   onInputChange = (event) => {
@@ -106,15 +123,23 @@ class App extends Component {
         { route === Routes.HOME 
           ? <div>
               <Logo />
-              <Rank />
-              <ImageLinkForm onInputChange={this.onInputChange} onSubmit={this.onSubmit} />
+              <Rank 
+              name={this.state.user.name} 
+              entries={this.state.user.entries} />
+              <ImageLinkForm 
+              onInputChange={this.onInputChange} 
+              onSubmit={this.onSubmit} />
               <FaceRecognition imageUrl={imageUrl} box={box} />
             </div>
           :
           (
             this.state.route === Routes.SIGNINROUTE
-            ? <Signin onRouteChanged={this.onRouteChanged}/>
-            : <Register onRouteChanged={this.onInputChange} />
+            ? <Signin 
+            loadUser={this.loadUser} 
+            onRouteChanged={this.onRouteChanged}/>
+            : <Register 
+            loadUser={this.loadUser} 
+            onRouteChanged={this.onRouteChanged} />
           )
         }
       </div>
