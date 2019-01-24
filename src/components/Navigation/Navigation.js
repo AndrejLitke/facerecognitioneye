@@ -1,5 +1,5 @@
 import React from 'react';
-import { SIGNINROUTE, HOME, REGISTERROUTE } from '../../routes';
+import { SIGNINROUTE, REGISTERROUTE } from '../../routes';
 
 const Navigation = ({onRouteChanged, isSignedIn}) => {
   if (isSignedIn) {
