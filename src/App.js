@@ -59,7 +59,6 @@ class App extends Component {
         joined: data.joined
         }
     });
-    console.log(this.state.user);
   }
 
   onInputChange = (event) => {
@@ -94,8 +93,27 @@ class App extends Component {
     .predict(
       Clarifai.FACE_DETECT_MODEL, 
       this.state.input)
-    .then((response) => this.displayFaceBox(this.calculateFaceLocation(response)))
-    .catch(err => console.log(err));
+    .then((response) => {
+      this.displayFaceBox(this.calculateFaceLocation(response));
+      if (response) {
+        fetch('http://localhost:3000/image', {
+          method: 'put',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({
+            id: this.state.user.id
+          })
+        })
+        .then(response => response.json())
+        .then(count => {
+          console.log(count)
+          if (count) {
+            this.setState(Object.assign(this.state.user, {entries: count}));
+          }
+        })
+        .catch(err => console.log(err));
+      }
+    })
+    .catch(err => console.log('predict error: ' + err));
   }
 
   onRouteChanged = (route) => {
