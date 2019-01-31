@@ -7,15 +7,8 @@ import FaceRecognition from './components/FaceRecognition/FaceRecognition';
 import Signin from './components/Signin/Signin';
 import Register from './components/Register/Register';
 import Particles from 'react-particles-js';
-import Clarifai from 'clarifai';
 import './App.css';
 import * as Routes from './routes.js';
-
-// instantiate a new Clarifai app passing in your api key.
-const clarifaiApp = new Clarifai.App({
-  apiKey: '6a67eeca32e54ea79be6202e8a4957e5'
-});
-
 
 const particlesOptions = {
             		particles: {
@@ -27,12 +20,9 @@ const particlesOptions = {
                     }
                   }
                 },
-            	};
-
-class App extends Component {
-  constructor() {
-    super();
-    this.state = {
+              };
+              
+const initialState = {
       input: '',
       imageUrl: '',
       box: {},
@@ -46,6 +36,12 @@ class App extends Component {
         joined: ''
       }
     }
+ 
+
+class App extends Component {
+  constructor() {
+    super();
+    this.state = initialState;
   }
 
   loadUser = (data) => {
@@ -79,20 +75,19 @@ class App extends Component {
   }
 
   displayFaceBox = (box) => {
-    console.log(box);
     this.setState({box: box});
   }
 
   onSubmit = () => {
     this.setState({imageUrl: this.state.input});
-
-    // predict the contents of an image by passing in a url
-    // the first string is the model id for face recognition
-    clarifaiApp.models
-    // .predict("a403429f2ddf4b49b307e318f00e528b", this.state.input)
-    .predict(
-      Clarifai.FACE_DETECT_MODEL, 
-      this.state.input)
+    fetch('http://localhost:3000/imageurl', {
+              method: 'post',
+              headers: {'Content-Type': 'application/json'},
+              body: JSON.stringify({
+                input: this.state.input
+              })
+    })
+    .then((response) => response.json())
     .then((response) => {
       this.displayFaceBox(this.calculateFaceLocation(response));
       if (response) {
@@ -118,11 +113,11 @@ class App extends Component {
 
   onRouteChanged = (route) => {
     if (route === Routes.SIGNINROUTE) {
-      this.setState({isSignedIn : false})
+      this.setState(initialState)
     } else if (route === Routes.HOME) {
       this.setState({isSignedIn : true})
     } else if (route === Routes.SIGNOUTROUTE) {
-      this.setState({isSignedIn : false})
+      this.setState(initialState)
     }
     
     this.setState({route: route});
